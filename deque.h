@@ -2,6 +2,7 @@
 #define DEQUE_H
 
 #include <iterator>
+using namespace std;
 
 template <class T>
 class Deque
@@ -33,6 +34,12 @@ public:
     Deque(): head(0), end(0), _size(0){}
 
     ~Deque(){
+
+        while(_size)
+            removeLast();
+        _size = 0;
+        head = 0;
+        end = 0;
 
     }
     bool isEmpty() const {return _size != 0;}
@@ -91,25 +98,49 @@ public:
 
 
     T removeFirst() {
+        try {
 
-        List* temp = head;
-        T data = temp->data;
-        head = head->next;
-        delete temp;
-        --_size;
-        return data;
+            if(_size == 0)
+                throw 0;
+
+            List* temp = head;
+            T data = temp->data;
+            if(head->next)
+                head = head->next;
+            else head = 0;
+            delete temp;
+            --_size;
+            return data;
+
+        }
+        catch(int) {
+
+            cerr << "Cannot delete element from empty deque" << endl;
+
+        }
 
     }
 
     T removeLast() {
+        try {
 
-        List* temp = end;
-        T data = temp->data;
-        end = end->prev;
-        delete temp;
-        --_size;
-        return data;
+            if(_size == 0)
+                throw 0;
 
+            List* temp = end;
+            T data = temp->data;
+            if(end->prev)
+                end = end->prev;
+            else end = 0;
+            delete temp;
+            --_size;
+            return data;
+        }
+        catch(int) {
+
+            cerr << "Cannot delete element from empty deque" << endl;
+
+        }
     }
 
     Iterator iterator() {return Iterator(head);}
