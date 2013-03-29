@@ -3,12 +3,12 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp \
-    deque.cpp
+SOURCES +=
 
 OTHER_FILES += \
     README.txt
 
 HEADERS += \
+    RandomizedQueue.h \
     deque.h
 
