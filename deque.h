@@ -2,13 +2,13 @@
 #define DEQUE_H
 
 #include <iterator>
+#include <iostream>
 using namespace std;
 
 template <class T>
 class Deque
 {
 public:
-
     struct List
     {
         List* prev;
@@ -22,76 +22,112 @@ public:
     public:
         Iterator(List* x) : p(x) {}
         Iterator(const Iterator& mit) : p(mit.p) {}
-        Iterator& operator++() {p = p->next;return *this;}
+
+        virtual Iterator& operator++() {
+
+            try {
+
+                if(p->next == 0)
+                    throw -1;
+
+                p = p->next;
+                return *this;
+
+            }
+            catch(int) {
+
+                cerr << "Iterator cannot move beyond the end" << endl;
+
+            }
+
+        }
+
         Iterator operator++(int) {Iterator tmp(*this); operator++(); return tmp;}
-        Iterator& operator--() {p = p->prev; return *this;}
+
+        virtual Iterator& operator--() {
+
+            try {
+
+                if(p->prev == 0)
+                    throw -1;
+
+                p = p->prev;
+                return *this;
+            }
+                catch(int) {
+
+                    cerr << "Iterator cannot move beyond the head" << endl;
+
+                }
+
+            }
+
         Iterator operator--(int) {Iterator tmp(*this); operator--(); return tmp;}
+
         bool operator==(const List& rhs) {return p==rhs.p;}
         bool operator!=(const List& rhs) {return p!=rhs.p;}
-        T& operator*() {return p->data;}
+
+        T& operator*() {
+            try {
+
+                if(p->next == 0)
+                    throw -1;
+
+                return p->data;
+            }
+            catch(int) {
+
+                cerr << "Cannot dereference a beyond-the-end iterator" << endl;
+
+            }
+        }
     };
 
-    Deque(): head(0), end(0), _size(0){}
+    Deque(): _size(0) {
+
+        _end = new List;
+        _end->prev = 0;
+        _end->next = 0;
+        _head = _end;
+
+    }
 
     ~Deque(){
 
         while(_size)
             removeLast();
         _size = 0;
-        head = 0;
-        end = 0;
+        delete _head;
+        _head = 0;
+        _end = 0;
 
     }
+
     bool isEmpty() const {return _size != 0;}
     int size() const {return _size;}
 
     void addFirst(const T& item) {
 
-        if(_size == 0) {
-
-            head = new List;
-            head->data = item;
-            head->prev = 0;
-            head->next = 0;
-            end = head;
-
-        }
-        else {
-
         List* temp = new List;
-        head->prev = temp;
-        temp->next = head;
-        temp->prev = 0;
         temp->data = item;
-        head = temp;
-
-        }
-
+        temp->prev = 0;
+        temp->next = _head;
+        _head->prev = temp;
+        _head = temp;
         ++_size;
 
     }
 
     void addLast(const T& item) {
 
-        if(_size == 0) {
-
-            end = new List;
-            end->data = item;
-            end->prev = 0;
-            end->next = 0;
-            head = end;
-        }
-        else {
-
         List* temp = new List;
-        end->next = temp;
-        temp->prev = end;
-        temp->next = 0;
         temp->data = item;
-        end = temp;
-
-        }
-
+        temp->prev = _end->prev;
+        temp->next = _end;
+        if(_size == 0)
+            _head->next = temp;
+        else _end->prev->next = temp;
+        _end->prev = temp;
         ++_size;
 
     }
@@ -101,13 +137,11 @@ public:
         try {
 
             if(_size == 0)
-                throw 0;
+                throw -1;
 
-            List* temp = head;
+            List* temp = _head;
             T data = temp->data;
-            if(head->next)
-                head = head->next;
-            else head = 0;
+            _head = _head->next;
             delete temp;
             --_size;
             return data;
@@ -125,29 +159,30 @@ public:
         try {
 
             if(_size == 0)
-                throw 0;
+                throw -1;
 
-            List* temp = end;
+            List* temp = _end->prev;
             T data = temp->data;
-            if(end->prev)
-                end = end->prev;
-            else end = 0;
+            _end->prev = temp->prev;
             delete temp;
             --_size;
             return data;
+
         }
         catch(int) {
 
             cerr << "Cannot delete element from empty deque" << endl;
 
         }
+
     }
 
-    Iterator iterator() {return Iterator(head);}
+    Iterator iterator() {return Iterator(_head);}
 
+    Iterator end() const {return _end;}
 private:
-    List* head;
-    List* end;
+    List* _head;
+    List* _end;
     unsigned int _size;
 };
 
