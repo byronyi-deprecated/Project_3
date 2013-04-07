@@ -7,7 +7,7 @@
 #include <time.h>
 #include <cstdlib>
 using namespace std;
-#define MAX 1
+#define MAX 20
 
 template <class T>
 class RandomizedQueue
@@ -58,13 +58,13 @@ public:
                 p = p->prev;
                 return *this;
             }
-                catch(int) {
+            catch(int) {
 
-                    cerr << "Iterator cannot move beyond the head" << endl;
-
-                }
+                cerr << "Iterator cannot move beyond the head" << endl;
 
             }
+
+        }
 
         Iterator operator--(int) {Iterator tmp(*this); operator--(); return tmp;}
 
@@ -86,6 +86,11 @@ public:
             }
         }
     };
+
+    void Print(List* item)
+    {
+        cout << item->data << endl;
+    }
 
     RandomizedQueue() : _size(0) {
         srand(time(NULL));
@@ -109,36 +114,30 @@ public:
 
         if(!_size) {
 
-            cout << "Build a new queue" << endl;
             temp->next = temp;
             temp->prev = temp;
             head = temp;
 
-            List* newBucket = new List;
-            newBucket = head;
-            buckets.push_back(newBucket);
+            buckets.push_back(temp);
         }
 
-        else if(_size < MAX) {
+        else if(buckets.size() < MAX) {
 
-            cout << "Buckets aren't filled" << endl;
             int num = rand() % buckets.size();
-
+            num = 0;
             temp->next = buckets[num];
-            temp->next->prev = temp;
             temp->prev = buckets[num]->prev;
             temp->prev->next = temp;
+            buckets[num]->prev = temp;
 
-            List* newBucket = temp;
-            buckets.insert(buckets.begin() + num, 1, newBucket);
+            buckets.insert(buckets.begin() + num, 1, temp);
+
         }
         else {
-            cout << "Buckets filled" << endl;
             int num = rand() % MAX;
-
             temp->next = buckets[num];
-            temp->next->prev = temp;
             temp->prev = buckets[num]->prev;
+            buckets[num]->prev = temp;
             temp->prev->next = temp;
             buckets[num] = temp;
         }
@@ -154,19 +153,32 @@ public:
 
             T data;
             if(_size == 1) {
-                cout << "dequeue from one element queue" << endl;
                 data = head->data;
                 buckets.clear();
                 delete head;
+                cout << "dequeue from one element queue" << endl;
             }
             else {
                 cout << "Dequeue" << endl;
                 unsigned int num = rand() % buckets.size();
-                List* temp = buckets[num].begin;
+                List* temp = buckets[num];
                 data = temp->data;
-                temp->prev = temp->next->prev;
-                temp->next = temp->prev->next;
-                if(!num) {
+                temp->next->prev = temp->prev;
+                temp->prev->next = temp->next;
+                if(num == MAX - 1) {
+                    if(buckets[num]->next = buckets[0])
+                        buckets.pop_back();
+                    else
+                        buckets[num] = buckets[num]->next;
+                }
+                else {
+                    if(buckets[num]->next = buckets[num + 1])
+                        buckets.erase(buckets.begin() + num);
+                    else
+                        buckets[num] = buckets[num]->next;
+                }
+
+                /*                if(!num) {
                     buckets.back().end->next = buckets[1].begin;
                     buckets[1].begin->prev = buckets.back().end;
                 }
@@ -180,8 +192,11 @@ public:
                 }
                 if(buckets[num].begin == buckets[num].end)
                     buckets.erase(buckets.begin() + num);
+*/
+
                 delete temp;
             }
+            --_size;
             return data;
         }
 
@@ -197,7 +212,7 @@ public:
                 throw -1;
 
             unsigned int num = rand() % buckets.size();
-            T data = buckets[num].begin->data;
+            T data = buckets[num]->data;
             return data;
 
         }
@@ -208,195 +223,16 @@ public:
 
     Iterator iterator() {
 
+        if(isEmpty())
+            return 0;
         unsigned int num = rand() % buckets.size();
-        return Iterator(buckets[0].begin);
-
+        for(int i = 0; i < buckets.size(); i++)
+            Print(buckets[i]);
+        return Iterator(buckets[0]);
     }
 private:
     unsigned int _size;
     List* head;
     vector<List*> buckets;
 };
-
-
-
-
-
-/*
-template <class T>
-class RandomizedQueue
-{
-public:
-    struct List
-    {
-        List* next;
-        T data;
-    };
-
-    struct Iterator : public std::iterator<std::forward_iterator_tag, T>
-    {
-        List* p;
-    public:
-        Iterator(List* x) : p(x) {}
-        Iterator(const Iterator& mit) : p(mit.p) {}
-
-        Iterator& operator++() {
-
-            try {
-
-                if(p == 0)
-                    throw -1;
-
-                p = p->next;
-                return *this;
-
-            }
-            catch(int) {
-
-                cerr << "Iterator cannot move beyond the end" << endl;
-
-            }
-
-        }
-
-        Iterator operator++(int) {Iterator tmp(*this); operator++(); return tmp;}
-
-        T& operator*() {return p->data;}
-    };
-
-    RandomizedQueue(): _size(0) {
-
-        srand(time(NULL));
-
-    }
-
-    ~RandomizedQueue() {
-
-        List* head = heads[0];
-        while(_size)
-        {
-            List* temp = head;
-            head = head->next;
-            delete temp;
-            --_size;
-        }
-
-    }
-
-
-    bool isEmpty() const {return _size == 0;}
-    int size() const {return _size;}
-
-    void enqueue(T item) {
-
-        List* temp = new List;
-        temp->data = item;
-
-        if(heads.size() != MAX) {
-
-            if(heads.empty()) {
-
-                heads.push_back(temp);
-
-            }
-            else if(rand() % 2) {
-                //insert the new item in the back
-                temp->next = heads[0];
-                heads.push_back(temp);
-                ends.push_back(temp);
-                heads[heads.size() - 2]->next = heads.back();
-
-            }
-            else {
-                //insert the new item in the front
-                heads.insert(heads.begin(), 1, temp);
-                ends.insert(ends.begin(), 1, temp);
-                heads.back()->next = heads[0];
-
-            }
-
-            delete temp;
-
-        }
-        else {
-            unsigned int bucket = rand() % MAX;
-            temp->next = heads[bucket];
-            heads[bucket] = temp;
-            if(bucket != 0)
-                ends[bucket - 1]->next = heads[bucket];
-            else
-                ends.back()->next = heads[0];
-        }
-
-        ++_size;
-
-    }
-
-    T dequeue() {
-
-        try {
-
-            if(heads.empty())
-                throw -1;
-
-            unsigned int bucket = rand() % heads.size();
-
-            T data = heads[bucket]->data;
-
-            if(heads.size() != MAX) {
-
-                if(bucket != 0) {
-                    ends[bucket - 1]->next = heads[bucket + 1];
-                }
-                delete heads[bucket];
-                heads.erase(heads.begin() + bucket);
-                ends.erase(ends.begin() + bucket);
-            }
-            else {
-                List* temp = heads[bucket];
-                heads[bucket] = heads[bucket]->next;
-                ends.back()->next = heads[0];
-                delete temp;
-            }
-
-            --_size;
-
-            return data;
-
-        }
-        catch(int) {
-            cerr << "Cannot dequeue from an empty container" << endl;
-        }
-
-    }
-
-    T sample() {
-        try {
-
-            if(heads.empty())
-                throw -1;
-
-            unsigned int bucket = rand() % heads.size();
-            T data = heads[bucket]->data;
-            return data;
-
-        }
-        catch(int) {
-            cerr << "Cannot sample from an empty container" << endl;
-        }
-    }
-
-    Iterator iterator() {
-
-        unsigned int bucket = rand() % heads.size();
-        return Iterator(heads[bucket]);
-
-    }
-
-private:
-    vector<List* > heads;
-    vector<List* > ends;
-    unsigned int _size;
-};
-*/
 #endif // RANDOMIZEDQUEUE_H
