@@ -23,7 +23,7 @@ public:
         Iterator(List* x) : p(x) {}
         Iterator(const Iterator& mit) : p(mit.p) {}
 
-        virtual Iterator& operator++() {
+        Iterator& operator++() {
 
             try {
 
@@ -44,7 +44,7 @@ public:
 
         Iterator operator++(int) {Iterator tmp(*this); operator++(); return tmp;}
 
-        virtual Iterator& operator--() {
+        Iterator& operator--() {
 
             try {
 
@@ -95,15 +95,12 @@ public:
     ~Deque(){
 
         while(_size)
-            removeLast();
-        _size = 0;
-        delete _head;
-        _head = 0;
-        _end = 0;
+            removeFirst();
+        delete _end;
 
     }
 
-    bool isEmpty() const {return _size != 0;}
+    bool isEmpty() const {return _size == 0;}
     int size() const {return _size;}
 
     void addFirst(const T& item) {
