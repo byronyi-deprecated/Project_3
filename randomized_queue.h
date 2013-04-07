@@ -226,9 +226,7 @@ public:
         if(isEmpty())
             return 0;
         unsigned int num = rand() % buckets.size();
-        for(int i = 0; i < buckets.size(); i++)
-            Print(buckets[i]);
-        return Iterator(buckets[0]);
+        return Iterator(buckets[num]);
     }
 private:
     unsigned int _size;
