@@ -129,7 +129,7 @@ public:
         temp->prev = _end->prev;
         temp->next = _end;
         if(_size == 0)
-            _head->next = temp;
+            _head = temp;
         else _end->prev->next = temp;
         _end->prev = temp;
         ++_size;
@@ -147,6 +147,7 @@ public:
             T data = temp->data;
             _head = _head->next;
             delete temp;
+            temp = 0;
             --_size;
             return data;
 
@@ -169,6 +170,7 @@ public:
             T data = temp->data;
             _end->prev = temp->prev;
             delete temp;
+            temp = 0;
             --_size;
             return data;
 

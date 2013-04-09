@@ -103,6 +103,7 @@ public:
             List* temp = head;
             head = head->next;
             delete temp;
+            temp = 0;
             --_size;
         }
     }
@@ -158,10 +159,9 @@ public:
                 data = head->data;
                 buckets.clear();
                 delete head;
-                cout << "dequeue from one element queue" << endl;
+                head = 0;
             }
             else {
-                cout << "Dequeue" << endl;
                 unsigned int num = rand() % buckets.size();
                 List* temp = buckets[num];
                 data = temp->data;
@@ -179,24 +179,8 @@ public:
                     else
                         buckets[num] = buckets[num]->next;
                 }
-
-                /*                if(!num) {
-                    buckets.back().end->next = buckets[1].begin;
-                    buckets[1].begin->prev = buckets.back().end;
-                }
-                else if(num == MAX - 1){
-                    buckets[num - 1].end->next = buckets[0].begin;
-                    buckets[0].begin->prev = buckets[num - 1].end;
-                }
-                else {
-                    buckets[num - 1].end->next = buckets[num + 1].begin;
-                    buckets[num + 1].begin->prev = buckets[num - 1].end;
-                }
-                if(buckets[num].begin == buckets[num].end)
-                    buckets.erase(buckets.begin() + num);
-*/
-
                 delete temp;
+                temp = 0;
             }
             --_size;
             return data;

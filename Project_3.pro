@@ -4,7 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    main.cpp
+    subset_main.cpp \
+    palin_main.cpp
 
 OTHER_FILES += \
     README.txt
