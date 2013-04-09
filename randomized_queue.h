@@ -30,17 +30,19 @@ public:
         Iterator& operator++() {
 
             try {
-
-                if(p->next == 0)
-                    throw -1;
+                if(p == 0) throw 0;
+                if(p->next == 0) throw -1;
 
                 p = p->next;
                 return *this;
 
             }
-            catch(int) {
+            catch(int err) {
 
-                cerr << "Iterator cannot move beyond the end" << endl;
+                if(err == 0)
+                    cerr << "The iterator incrementing is un-defined" << endl;
+                if(err == -1)
+                    cerr << "Iterator cannot move beyond the end" << endl;
 
             }
 
@@ -52,15 +54,17 @@ public:
 
             try {
 
-                if(p->prev == 0)
-                    throw -1;
+                if(p == 0) throw 0;
+                if(p->prev == 0) throw -1;
 
                 p = p->prev;
                 return *this;
             }
-            catch(int) {
-
-                cerr << "Iterator cannot move beyond the head" << endl;
+            catch(int err) {
+                if(err == 0)
+                    cerr << "The iterator decrementing is un-defined" << endl;
+                if(err == -1)
+                    cerr << "Iterator cannot move beyond the head" << endl;
 
             }
 
@@ -74,14 +78,12 @@ public:
         T& operator*() {
             try {
 
-                if(p->next == 0)
-                    throw -1;
-
+                if(p == 0) throw 0;
                 return p->data;
             }
             catch(int) {
 
-                cerr << "Cannot dereference a beyond-the-end iterator" << endl;
+                cerr << "The iterator dereferencing is un-defined" << endl;
 
             }
         }
